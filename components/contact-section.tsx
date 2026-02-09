@@ -70,7 +70,7 @@ export function ContactSection() {
 
           <h2 className="text-3xl md:text-5xl font-light text-foreground mb-6 text-balance">
             Partner with us to drive <br />
-            <span className="text-muted-foreground">frica's digital future.</span>
+            <span className="text-muted-foreground">Africa's digital future.</span>
           </h2>
 
           <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto">

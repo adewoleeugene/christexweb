@@ -14,6 +14,9 @@ import path from "path"
 
 import { getGalleryImages } from "@/lib/airtable"
 
+// Revalidate page every hour to pick up new Airtable changes
+export const revalidate = 3600
+
 export default async function HomePage() {
   let galleryImages: string[] = []
 
