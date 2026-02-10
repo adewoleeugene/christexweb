@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 
 const footerLinks = {
   programs: [
@@ -24,10 +25,7 @@ const footerLinks = {
       href: "https://drive.google.com/drive/folders/1duceU8Oi9rRBeEcQL8e5IBJpCfZ7734b?usp=sharing",
     },
   ],
-  legal: [
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
-  ],
+
 }
 
 export function Footer() {
@@ -44,7 +42,7 @@ export function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <img src="/images/logomark-20on-20black.png" alt="Christex Foundation" className="h-8 w-auto" />
+              <Image src="/images/logomark-20on-20black.png" alt="Christex Foundation" width={32} height={32} className="h-8 w-auto" />
               <span className="font-mono text-sm tracking-wider uppercase text-foreground">Christex Foundation</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mb-4">
@@ -115,19 +113,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Legal Links */}
-          <div>
-            <div className="font-mono text-xs tracking-widest uppercase text-muted-foreground mb-4">Legal</div>
-            <ul className="space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+
         </div>
 
         {/* Bottom Bar */}

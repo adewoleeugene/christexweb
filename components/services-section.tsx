@@ -65,17 +65,14 @@ export function ServicesSection() {
   const isMobile = useIsMobile()
 
   return (
-    <section id="services" ref={ref} className="py-32 bg-background relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <section id="services" ref={ref} className="py-32 bg-background relative">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8"
+          className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8 relative"
         >
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-6">
@@ -84,15 +81,12 @@ export function ServicesSection() {
             </div>
 
             <h2 className="text-3xl md:text-5xl font-light text-foreground text-balance leading-tight">
-              Building Africa's digital future through <span className="text-muted-foreground">education</span>, <span className="text-muted-foreground">innovation</span>, and <span className="text-muted-foreground">opportunity</span>.
+              Building Africa&apos;s digital future through <span className="text-muted-foreground">education</span>, <span className="text-muted-foreground">innovation</span>, and <span className="text-muted-foreground">opportunity</span>.
             </h2>
           </div>
 
-          <div className="hidden md:block">
-            <div className="w-24 h-24 rounded-full border border-dashed border-border flex items-center justify-center animate-spin-slow">
-              <ArrowUpRight className="text-muted-foreground" />
-            </div>
-          </div>
+          {/* Accent Glow for Header - light orange and spread out */}
+          <div className="absolute top-0 -right-24 w-96 h-96 bg-orange-500/10 blur-[100px] rounded-full pointer-events-none mix-blend-screen -z-10" />
         </motion.div>
 
         {/* Bento Grid */}
@@ -176,6 +170,10 @@ export function ServicesSection() {
           })}
         </div>
       </div>
+
+      {/* Background Decor - moved to end and removed overflow-hidden for seamless blend */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-48 right-0 w-[600px] h-[600px] bg-orange-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
     </section>
   )
 }

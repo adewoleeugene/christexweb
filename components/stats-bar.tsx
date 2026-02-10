@@ -8,7 +8,7 @@ const stats = [
   { value: "4,500+", label: "Participants Trained" },
   { value: "14K", label: "Training Hours" },
   { value: "$52K", label: "Hackathon Earnings" },
-  { value: "5,761", label: "Students Reached" },
+  { value: "5K+", label: "Students Reached" },
 ]
 
 export function StatsBar() {

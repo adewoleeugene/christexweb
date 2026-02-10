@@ -4,6 +4,8 @@ import * as React from "react"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, MonitorPlay, BookOpen } from "lucide-react"
+import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import {
   NavigationMenu,
@@ -21,27 +23,53 @@ import {
 } from "@/components/ui/accordion"
 import { cn } from "@/lib/utils"
 
+
+// import type { LearnResource } from "@/lib/airtable" // Import this type
+
 const communityItems = [
   { title: "Problem Bank", href: "https://build.christex.foundation/", description: "Find problems to solve." },
   { title: "Bounty", href: "https://earn.christex.foundation/", description: "Earn rewards for contributions." },
-  { title: "Events", href: "/events", description: "Upcoming community gatherings." },
-  { title: "Hackathon", href: "/hackathon", description: "Participate in hackathons." },
+  // { title: "Events", href: "/events", description: "Upcoming community gatherings." },
+  // { title: "Hackathon", href: "/hackathon", description: "Participate in hackathons." },
   { title: "News", href: "/blog", description: "Latest updates and articles." },
 ]
 
-const learnItems = [
+// Default/Fallback data
+const defaultLearnItems = [
   {
     category: "Videos",
     icon: MonitorPlay,
     items: [
-      { title: "Season One: Wave One | Educational Videos", href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoCH5M92lJ85gUdaD9Z--Vop" },
-      { title: "AI Series", href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoD336iw-5RH8OORD6kDSF6U" },
-      { title: "Solana - How it works", href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoBU7-f_HZOSi8qiZwKH5tOf" },
-      { title: "Season One | Wave Two | Product Workshop", href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoD1VHrmR0E6_ShUwQ-FQivV" },
-      { title: "Season One | Wave Two | Digital Literacy", href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoCGSrw9pZu5s1A59p0DADAa" },
-      { title: "Season One | Wave Two | Engineering Essentials", href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoDuFfvc9I5iW6Y_VEEcjfHk" },
+      {
+        title: "Season One: Wave One | Educational Videos",
+        href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoCH5M92lJ85gUdaD9Z--Vop"
+      },
+      {
+        title: "AI Series",
+        href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoD336iw-5RH8OORD6kDSF6U",
+        featured: true,
+        thumbnail: "https://i.ytimg.com/vi/zqLXS0zsTtM/maxresdefault.jpg",
+        description: "Dive deep into the fundamentals of Artificial Intelligence."
+      },
+      {
+        title: "Solana - How it works",
+        href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoBU7-f_HZOSi8qiZwKH5tOf"
+      },
+      {
+        title: "Season One | Wave Two | Product Workshop",
+        href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoD1VHrmR0E6_ShUwQ-FQivV"
+      },
+      {
+        title: "Season One | Wave Two | Digital Literacy",
+        href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoCGSrw9pZu5s1A59p0DADAa"
+      },
+      {
+        title: "Season One | Wave Two | Engineering Essentials",
+        href: "https://www.youtube.com/playlist?list=PLjuk89-5uXoDuFfvc9I5iW6Y_VEEcjfHk"
+      },
     ]
   },
+  /*
   {
     category: "Articles",
     icon: BookOpen,
@@ -49,10 +77,61 @@ const learnItems = [
       { title: "Coming soon", href: "#" }
     ]
   }
+  */
+
 ]
 
-export function Header() {
+// Define types to strictly match what Airtable returns
+interface LearnResource {
+  id: string;
+  title: string;
+  url: string;
+  category: string;
+  featured?: boolean;
+  thumbnail?: string;
+  description?: string;
+}
+
+interface HeaderProps {
+  learnResources?: LearnResource[];
+}
+
+export function Header({ learnResources = [] }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false)
+
+  // Merge/Transform learn resources
+  // If resources are passed, group them. If not, use default.
+  // Note: We need to map category string to an icon.
+  const categoryIcons: Record<string, any> = {
+    "Videos": MonitorPlay,
+    "Articles": BookOpen,
+    // Add others as needed
+  };
+
+  const menuItems = React.useMemo(() => {
+    if (!learnResources || learnResources.length === 0) return defaultLearnItems;
+
+    const grouped = learnResources.reduce((acc, item) => {
+      const cat = item.category || "Other";
+      if (!acc[cat]) {
+        acc[cat] = {
+          category: cat,
+          icon: categoryIcons[cat] || BookOpen,
+          items: []
+        };
+      }
+      acc[cat].items.push({
+        title: item.title,
+        href: item.url,
+        featured: item.featured,
+        thumbnail: item.thumbnail,
+        description: item.description
+      });
+      return acc;
+    }, {} as Record<string, any>);
+
+    return Object.values(grouped);
+  }, [learnResources]);
 
   // State for the "Featured" item in the menu
   const [featuredItem, setFeaturedItem] = useState<{
@@ -101,7 +180,7 @@ export function Header() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <img src="/images/logomark-20on-20black.png" alt="Christex Foundation" className="h-8 w-auto" />
+            <Image src="/images/logomark-20on-20black.png" alt="Christex Foundation" width={32} height={32} className="h-8 w-auto" />
             <span className="font-mono text-sm tracking-wider uppercase text-foreground hidden sm:block">
               Christex Foundation
             </span>
@@ -131,9 +210,10 @@ export function Header() {
                         {/* Background Image if available */}
                         {effectiveFeaturedItem.imageUrl ? (
                           <>
-                            <img
+                            <Image
                               src={effectiveFeaturedItem.imageUrl}
-                              alt=""
+                              alt={effectiveFeaturedItem.title}
+                              fill
                               className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-70 transition-opacity duration-500"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
@@ -164,29 +244,67 @@ export function Header() {
                     Learn
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                      {learnItems.map((section) => (
-                        <div key={section.category} className="space-y-3">
-                          <h4 className="font-medium leading-none flex items-center gap-2">
-                            <section.icon className="h-4 w-4" />
-                            {section.category}
-                          </h4>
-                          <ul className="space-y-2">
-                            {section.items.map((item) => (
-                              <li key={item.title}>
-                                <NavigationMenuLink asChild>
-                                  <a
-                                    href={item.href}
-                                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-sm"
-                                  >
-                                    {item.title}
-                                  </a>
-                                </NavigationMenuLink>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
+                    <div className="grid w-[500px] grid-cols-[1fr_220px] gap-4 p-4 md:w-[600px] md:grid-cols-[1fr_240px]">
+                      <div className="flex flex-col gap-3">
+                        {menuItems.map((section: any) => (
+                          <div key={section.category} className="space-y-3">
+                            {/* <h4 className="font-medium leading-none flex items-center gap-2">
+                              <section.icon className="h-4 w-4" />
+                              {section.category}
+                            </h4> */}
+                            <ul className="grid gap-2">
+                              {section.items.map((item: any) => (
+                                <ListItem key={item.title} title={item.title} href={item.href}>
+
+                                </ListItem>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Featured Learn Item (Dynamic) */}
+                      {(() => {
+                        const featuredLearnItem = menuItems.flatMap((sec: any) => sec.items).find((i: any) => i.featured)
+
+                        if (!featuredLearnItem) return null;
+
+                        return (
+                          <a
+                            href={featuredLearnItem.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex flex-col justify-end rounded-xl bg-neutral-900 border border-white/10 p-6 no-underline outline-none focus:shadow-md h-full relative overflow-hidden group select-none hover:border-primary/50 transition-colors"
+                          >
+                            {(featuredLearnItem as any).thumbnail ? (
+                              <Image
+                                src={(featuredLearnItem as any).thumbnail}
+                                alt={featuredLearnItem.title}
+                                fill
+                                className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-60 transition-opacity duration-500 scale-105 group-hover:scale-110"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+
+                            <div className="relative z-10 mt-auto">
+                              <div className="text-xs font-mono text-primary mb-2 uppercase tracking-widest">Featured</div>
+                              <div className="mb-2 text-xl font-bold text-white leading-tight">
+                                {featuredLearnItem.title}
+                              </div>
+                              {(featuredLearnItem as any).description && (
+                                <p className="text-sm leading-tight text-white/80 mb-4">
+                                  {(featuredLearnItem as any).description}
+                                </p>
+                              )}
+                              <div className="inline-flex items-center justify-center rounded-full bg-white text-black px-4 py-1.5 text-xs font-bold font-mono uppercase tracking-wide group-hover:bg-primary transition-colors">
+                                Watch Now
+                              </div>
+                            </div>
+                          </a>
+                        )
+                      })()}
                     </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -252,11 +370,11 @@ export function Header() {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="flex flex-col gap-4 pl-4 pt-2">
-                      {learnItems.map((section) => (
+                      {menuItems.map((section: any) => (
                         <div key={section.category} className="space-y-2">
                           <div className="text-xs font-semibold text-muted-foreground uppercase">{section.category}</div>
                           <div className="flex flex-col gap-2 pl-2">
-                            {section.items.map((item) => (
+                            {section.items.map((item: any) => (
                               <a
                                 key={item.title}
                                 href={item.href}

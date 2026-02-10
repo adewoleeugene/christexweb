@@ -31,11 +31,8 @@ export function AboutSection() {
   ]
 
   return (
-    <section id="about" ref={ref} className="relative py-32 bg-background overflow-hidden">
-      {/* Background Gradient Orb */}
-      <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10 pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <section id="about" ref={ref} className="relative py-32 bg-background">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
 
           {/* Left Column - Story */}
@@ -65,14 +62,16 @@ export function AboutSection() {
               </p>
             </div>
 
-            <div className="mt-12 flex items-center gap-12 border-t border-border pt-8">
-              <div>
-                <div className="text-3xl font-light text-foreground">4,500+</div>
-                <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mt-2">Learners Trained</div>
-              </div>
-              <div>
-                <div className="text-3xl font-light text-foreground">$52k+</div>
-                <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mt-2">Hackathon Earnings</div>
+            <div className="mt-12 flex items-center gap-12 border-t border-border pt-8 relative">
+              <div className="relative z-10 flex items-center gap-12">
+                <div>
+                  <div className="text-3xl font-light text-foreground">4,500+</div>
+                  <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mt-2">Learners Trained</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-light text-foreground">$52k+</div>
+                  <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider mt-2">Hackathon Earnings</div>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -111,6 +110,11 @@ export function AboutSection() {
 
         </div>
       </div>
+      {/* Decorative Orbs - Subtly spread out behind stats */}
+      <div className="absolute top-[600px] left-[-5%] w-[600px] h-[600px] bg-orange-500/10 blur-[130px] rounded-full pointer-events-none mix-blend-screen" />
+
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute -bottom-48 -left-24 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[140px] pointer-events-none mix-blend-screen" />
     </section>
   )
 }

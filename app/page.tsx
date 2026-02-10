@@ -12,22 +12,30 @@ import { Footer } from "@/components/footer"
 import fs from "fs"
 import path from "path"
 
-import { getGalleryImages } from "@/lib/airtable"
+import { getGalleryImages, getLearnResources } from "@/lib/airtable"
 
 // Revalidate page every hour to pick up new Airtable changes
 export const revalidate = 3600
 
 export default async function HomePage() {
   let galleryImages: string[] = []
+  let learnResources: any[] = []
 
   // Try to fetch from Airtable first
   try {
-    const remoteImages = await getGalleryImages()
+    const [remoteImages, fetchedResources] = await Promise.all([
+      getGalleryImages(),
+      getLearnResources()
+    ])
+
     if (remoteImages.length > 0) {
       galleryImages = remoteImages
     }
+    learnResources = fetchedResources
   } catch (e) {
-    console.error("Failed to fetch gallery from Airtable", e)
+    console.error("Failed to fetch data from Airtable", e)
+    // Retrying individually just in case one failed (though lib handles errors)
+    learnResources = await getLearnResources()
   }
 
   // Fallback to local file system if needed (and available server-side)
@@ -44,8 +52,8 @@ export default async function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
-      <Header />
+    <main className="min-h-screen bg-background overflow-x-hidden">
+      <Header learnResources={learnResources} />
       <HeroSection />
       <StatsBar />
       <ServicesSection />

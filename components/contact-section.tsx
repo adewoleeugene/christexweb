@@ -53,7 +53,7 @@ export function ContactSection() {
   ]
 
   return (
-    <section id="contact" ref={ref} className="py-32 bg-background border-t border-border">
+    <section id="contact" ref={ref} className="py-32 bg-background border-t border-border relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         {/* Header */}
         <motion.div
@@ -98,6 +98,7 @@ export function ContactSection() {
               >
                 {/* Hover Tech Pattern */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                 <div className="relative z-10 flex justify-between items-start">
@@ -159,12 +160,13 @@ export function ContactSection() {
             </a>
           </div>
 
-          <div className="inline-flex items-center gap-2 font-mono text-xs tracking-widest uppercase text-muted-foreground mt-8">
-            <span className="pb-0.5">Start a Conversation</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </div>
+
         </motion.div>
       </div>
+
+      {/* Decorative Gradients */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-accent/10 blur-[150px] rounded-full pointer-events-none translate-x-1/3 translate-y-1/3" />
     </section>
   )
 }

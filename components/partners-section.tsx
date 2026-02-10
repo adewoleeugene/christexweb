@@ -22,7 +22,7 @@ export function PartnersSection() {
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section id="partners" ref={ref} className="py-32 bg-background relative overflow-hidden">
+    <section id="partners" ref={ref} className="py-32 bg-background relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

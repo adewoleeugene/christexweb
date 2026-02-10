@@ -56,11 +56,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     processedContent = processedContent.replace(/{{video}}/g, '');
 
     return (
-        <main className="min-h-screen bg-background text-foreground pb-20">
+        <main className="min-h-screen bg-background text-foreground pb-20 overflow-x-hidden">
             <Header />
 
-            <article className="pt-32 pb-12 px-6 lg:px-12">
-                <div className="max-w-3xl mx-auto">
+            <article className="pt-32 pb-12 px-6 lg:px-12 relative overflow-visible">
+                {/* Background Decor - Visible orange glow */}
+                <div className="absolute top-24 -right-1/4 w-[700px] h-[700px] bg-orange-500/15 blur-[140px] rounded-full pointer-events-none mix-blend-screen" />
+
+                <div className="max-w-3xl mx-auto relative z-10">
 
                     <header className="mb-12">
                         <div className="flex items-center gap-4 text-sm text-muted-foreground font-mono mb-6">
@@ -111,7 +114,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                                             return null;
                                         };
 
-                                        const embedUrl = getEmbedUrl(props.src);
+                                        const embedUrl = getEmbedUrl(props.src as string);
 
                                         if (embedUrl) {
                                             return (
@@ -151,8 +154,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             {/* Next Post Navigation Block (Bottom of Article) */}
             {nextPost && (
-                <section className="py-12 border-t border-border mt-12 mb-20">
-                    <div className="max-w-3xl mx-auto px-6 text-center">
+                <section className="py-12 border-t border-border mt-12 mb-20 relative">
+                    <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
                         <p className="text-sm font-mono text-muted-foreground mb-4 uppercase tracking-widest">Next Article</p>
                         <h2 className="text-3xl font-bold mb-8 hover:text-primary transition-colors">
                             <Link href={`/blog/${nextPost.slug}`}>{nextPost.title}</Link>
@@ -163,6 +166,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     </div>
                 </section>
             )}
+
+            {/* Enhanced Bottom Decor - Teal sweep */}
+            <div className="relative h-0 overflow-visible">
+                <div className="absolute bottom-[-100px] left-[-10%] w-[700px] h-[700px] bg-teal-500/10 blur-[140px] rounded-full pointer-events-none mix-blend-screen" />
+            </div>
 
             <Footer />
 

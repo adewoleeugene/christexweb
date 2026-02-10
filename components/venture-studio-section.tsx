@@ -15,6 +15,8 @@ import {
   Database
 } from "lucide-react"
 
+import { SubmitIdeaModal } from "@/components/submit-idea-modal"
+
 const categories = [
   { id: "all", label: "All", icon: LayoutGrid },
   { id: "FinTech", label: "FinTech", icon: Wallet },
@@ -208,13 +210,7 @@ export function VentureStudioSection() {
           <p className="text-muted-foreground mb-6">
             Have an idea that solves a real problem in Africa? We partner with exceptional founders.
           </p>
-          <button
-            onClick={() => window.location.href = "mailto:hello@christex.foundation"}
-            className="inline-flex items-center gap-2 font-mono text-xs tracking-widest uppercase text-foreground hover:text-accent transition-colors group"
-          >
-            Submit Your Idea
-            <ArrowUpRight className="w-4 h-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-          </button>
+          <SubmitIdeaModal />
         </div>
       </div>
     </section>

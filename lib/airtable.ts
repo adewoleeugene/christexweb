@@ -38,6 +38,16 @@ export interface BlogPost {
     readTime?: string;
 }
 
+export interface LearnResource {
+    id: string;
+    title: string;
+    url: string;
+    category: string;
+    featured?: boolean;
+    thumbnail?: string;
+    description?: string;
+}
+
 // Mock data for fallback
 const MOCK_EVENTS: Event[] = [
     {
@@ -112,6 +122,8 @@ We heavily invested in pilot programs...
         readTime: "8 min read"
     }
 ];
+
+const MOCK_LEARN_RESOURCES: LearnResource[] = [];
 
 export async function getEvents(): Promise<Event[]> {
     if (!base || !eventsTableId) {
@@ -191,25 +203,16 @@ export async function getGalleryImages(): Promise<string[]> {
 }
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
-    console.log("Starting getBlogPosts...");
     if (!base || !blogTableId) {
         console.warn("Airtable credentials or table ID missing (base is null), using mock data for Blog.");
-        // Debug which key is missing without revealing them fully
-        console.log(`BaseID configured: ${!!baseId}, API Key configured: ${!!apiKey}, BlogTableID configured: ${!!blogTableId}`);
         return MOCK_NEWS;
     }
 
     try {
-        // Removed status filter for debugging: filterByFormula: "{Status} = 'Published'"
-        console.log(`Querying Airtable table '${blogTableId}' for ALL posts (Debug Mode)...`);
         const records = await base(blogTableId).select({
             sort: [{ field: 'Date', direction: 'desc' }],
         }).all();
 
-        console.log(`Successfully fetched ${records.length} blog posts from Airtable.`);
-        if (records.length === 0) {
-            console.log("No records found. Check if table name is correct.");
-        }
         return records.map(record => mapRecordToBlogPost(record));
     } catch (error) {
         console.error("Error fetching news from Airtable:", error);
@@ -219,30 +222,52 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
     if (!base || !blogTableId) {
-        // Mock fallback by slug
         return MOCK_NEWS.find(p => p.slug === slug) || null;
     }
 
     try {
         const decodedSlug = decodeURIComponent(slug);
-        console.log(`[DEBUG] Fetching blog post for slug: "${decodedSlug}" (Original: "${slug}")`);
 
-        // We fetch by slug but remove status check for now to be safe
         const records = await base(blogTableId).select({
             filterByFormula: `{Slug} = '${decodedSlug}'`,
             maxRecords: 1
         }).firstPage();
 
         if (records.length === 0) {
-            console.log(`[DEBUG] No blog post found for slug: "${decodedSlug}"`);
             return null;
         }
 
-        console.log(`[DEBUG] Found blog post: "${records[0].get('Title')}"`);
         return mapRecordToBlogPost(records[0]);
     } catch (error) {
         console.error("Error fetching single post from Airtable:", error);
         return null;
+    }
+}
+
+export async function getLearnResources(): Promise<LearnResource[]> {
+    const learnTableId = process.env.AIRTABLE_LEARN_TABLE_ID;
+
+    if (!base || !learnTableId) {
+        return MOCK_LEARN_RESOURCES;
+    }
+
+    try {
+        const records = await base(learnTableId).select({
+            sort: [{ field: 'Title', direction: 'asc' }]
+        }).all();
+
+        return records.map(record => ({
+            id: record.id,
+            title: record.get('Title') as string,
+            url: record.get('URL') as string,
+            category: record.get('Category') as string,
+            featured: record.get('Featured') as boolean,
+            thumbnail: (record.get('Thumbnail') as any)?.[0]?.url || (record.get('ThumbnailURL') as string),
+            description: record.get('Description') as string,
+        }));
+    } catch (error) {
+        console.error("Error fetching learn resources from Airtable:", error);
+        return MOCK_LEARN_RESOURCES;
     }
 }
 
@@ -295,9 +320,6 @@ function mapRecordToBlogPost(record: any): BlogPost {
     // Video URL processing
     const videoUrl = record.get('VideoURL') as string;
 
-    console.log(`[DEBUG] Post: "${record.get('Title')}" | Image: ${mainImageUrl ? 'FOUND' : 'MISSING'} | Video: ${videoUrl ? 'FOUND' : 'MISSING'}`);
-
-
     return {
         id: record.id,
         title: record.get('Title') as string,
@@ -312,4 +334,39 @@ function mapRecordToBlogPost(record: any): BlogPost {
         readTime: readTime,
         contentImages,
     };
+}
+
+export async function submitIdea(data: {
+    title: string;
+    problem: string;
+    solution: string;
+    resources: string;
+    category: string;
+}) {
+    if (!base) {
+        console.error("Airtable not initialized");
+        return { success: false, error: "Database connection failed" };
+    }
+
+    try {
+        // Use table name 'Ideas' directly or an env var if preferred
+        const tableId = 'tbltYJmENoTTmbRyx';
+
+        await base(tableId).create([
+            {
+                fields: {
+                    Title: data.title,
+                    Problem: data.problem,
+                    Solution: data.solution,
+                    Resources: data.resources,
+                    Category: data.category,
+                    Status: 'New'
+                }
+            }
+        ], { typecast: true });
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error submitting idea to Airtable:", error);
+        return { success: false, error: error.message || JSON.stringify(error) };
+    }
 }
