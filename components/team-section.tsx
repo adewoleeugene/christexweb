@@ -89,6 +89,13 @@ const team: TeamMember[] = [
         image: "/images/team/benjamin.webp",
         socials: []
     },
+    {
+        name: "Mark Gbla",
+        role: "Software Engineer",
+        category: "Development",
+        image: "/images/team/mark-gbla.webp",
+        socials: []
+    },
 ]
 
 const categories = [
