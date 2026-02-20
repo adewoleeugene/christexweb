@@ -48,11 +48,11 @@ export function PartnersSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: index * 0.05 }}
-              className="group relative bg-background border-r border-b border-border p-8 h-[280px] flex flex-col justify-between hover:bg-card/30 transition-colors"
+              className="group relative bg-background border-r border-b border-border p-8 h-[280px] flex flex-col justify-between hover:bg-primary/5 hover:border-primary/50 hover:shadow-[0_0_40px_-10px_rgba(0,255,128,0.15)] hover:z-10 hover:-translate-y-1 transition-all duration-300 cursor-default"
             >
               {/* Top: Type Label */}
               <div className="flex items-start justify-between">
-                <span className="font-mono text-xs text-muted-foreground uppercase tracking-wider opacity-70">
+                <span className="font-mono text-xs text-muted-foreground uppercase tracking-wider opacity-70 group-hover:opacity-100 group-hover:text-primary transition-all duration-300">
                   {partner.type}
                 </span>
               </div>
@@ -60,7 +60,7 @@ export function PartnersSection() {
               {/* Bottom: Name */}
               <div>
                 {/* Use a slightly smaller text for very long names if needed, but keeping it standard for now */}
-                <h3 className="text-2xl md:text-3xl text-foreground font-light leading-snug">
+                <h3 className="text-2xl md:text-3xl text-foreground font-light leading-snug group-hover:text-primary transition-colors duration-300">
                   {partner.name}
                 </h3>
               </div>
