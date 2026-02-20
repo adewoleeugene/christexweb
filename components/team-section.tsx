@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
@@ -102,14 +102,40 @@ export function TeamSection() {
     const [activeCategory, setActiveCategory] = useState("All")
     const [hoveredMember, setHoveredMember] = useState<string | null>(null)
 
+    useEffect(() => {
+        if (hoveredMember) {
+            const el = document.getElementById(`nav-${hoveredMember.replace(/\s+/g, '-')}`)
+            const container = document.getElementById("nav-container")
+            if (el && container) {
+                const cRect = container.getBoundingClientRect()
+                const eRect = el.getBoundingClientRect()
+
+                // Mobile: horizontal scroll check
+                if (eRect.left < cRect.left || eRect.right > cRect.right) {
+                    container.scrollTo({
+                        left: container.scrollLeft + (eRect.left - cRect.left) - (cRect.width / 2) + (eRect.width / 2),
+                        behavior: 'smooth'
+                    })
+                }
+
+                // Desktop: vertical scroll check
+                if (eRect.top < cRect.top || eRect.bottom > cRect.bottom) {
+                    container.scrollTo({
+                        top: container.scrollTop + (eRect.top - cRect.top) - (cRect.height / 2) + (eRect.height / 2),
+                        behavior: 'smooth'
+                    })
+                }
+            }
+        }
+    }, [hoveredMember])
+
     const filteredTeam = activeCategory === "All"
         ? team
         : team.filter(member => member.category === activeCategory)
 
     return (
-        <section className="relative w-full h-screen max-h-screen py-4 md:py-8 bg-background text-foreground overflow-hidden flex flex-col">
-            <div className="container mx-auto px-4 md:px-6 h-full flex flex-col">
-
+        <section className="relative w-full min-h-screen lg:h-screen lg:max-h-screen py-4 md:py-8 bg-background text-foreground flex flex-col">
+            <div className="container mx-auto px-4 md:px-6 flex-1 flex flex-col">
 
                 {/* System Status */}
                 <div className="flex-none mb-6">
@@ -119,41 +145,53 @@ export function TeamSection() {
                     </div>
                 </div>
 
-                <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-12 min-h-0">
+                <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-12 min-h-0 lg:items-stretch items-start">
 
                     {/* Sidebar / Navigation */}
-                    <div className="flex-none lg:w-64 space-y-8">
-                        <div>
-                            <h2 className="text-xl font-medium mb-6">Personnel Directory</h2>
-                            <nav className="flex flex-col gap-1 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-none">
+                    <div className="flex-none lg:w-64 space-y-4 lg:space-y-0 mb-6 lg:mb-0 flex flex-col">
+                        <h2 className="text-xl font-medium mb-4 lg:mb-6 shrink-0 lg:h-[28px] flex lg:items-center">Personnel Directory</h2>
+                        <nav id="nav-container" className="flex flex-wrap lg:flex-col lg:flex-nowrap lg:justify-between flex-1 gap-2 lg:gap-1 max-h-none scrollbar-none pb-2 lg:pb-0 relative">
 
-                                {team.map((member) => (
-                                    <div
-                                        key={member.name}
-                                        onMouseEnter={() => setHoveredMember(member.name)}
-                                        onMouseLeave={() => setHoveredMember(null)}
-                                        className={cn(
-                                            "flex flex-col px-4 py-3 text-sm transition-all duration-300 border-l-2 text-left group cursor-default",
-                                            hoveredMember === member.name
-                                                ? "border-primary bg-muted/40 text-foreground font-medium"
-                                                : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/20"
-                                        )}
-                                    >
-                                        <span>{member.name}</span>
-                                        <span className="text-[10px] text-muted-foreground/70 uppercase tracking-wider font-normal mt-0.5 group-hover:text-muted-foreground transition-colors">
-                                            {member.role}
-                                        </span>
-                                    </div>
-                                ))}
-                            </nav>
-                        </div>
+                            {team.map((member) => (
+                                <div
+                                    key={member.name}
+                                    id={`nav-${member.name.replace(/\s+/g, '-')}`}
+                                    onPointerEnter={(e) => {
+                                        if (e.pointerType === "mouse") setHoveredMember(member.name)
+                                    }}
+                                    onPointerLeave={(e) => {
+                                        if (e.pointerType === "mouse") setHoveredMember(null)
+                                    }}
+                                    onClick={() => {
+                                        setHoveredMember(prev => prev === member.name ? null : member.name);
+                                        const card = document.getElementById(`person-${member.name.replace(/\s+/g, '-')}`);
+                                        if (card) {
+                                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        }
+                                    }}
+                                    className={cn(
+                                        "flex flex-col px-4 py-2 lg:py-3 text-xs lg:text-sm transition-all duration-300 border border-border lg:border-0 lg:border-l-2 rounded-full lg:rounded-none text-left group cursor-pointer lg:cursor-default shrink-0",
+                                        hoveredMember === member.name
+                                            ? "border-primary lg:border-primary bg-primary/10 lg:bg-muted/40 text-foreground font-medium"
+                                            : "lg:border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/20"
+                                    )}
+                                >
+                                    <span>{member.name}</span>
+                                    <span className="text-[10px] text-muted-foreground/70 uppercase tracking-wider font-normal mt-0.5 group-hover:text-muted-foreground transition-colors hidden lg:block">
+                                        {member.role}
+                                    </span>
+                                </div>
+                            ))}
+                        </nav>
                     </div>
 
                     {/* Main Content Grid */}
-                    <div className="flex-1 min-h-0 overflow-y-auto scrollbar-none pr-2">
+                    <div className="flex-1 min-h-0 scrollbar-none pr-0 lg:pr-2 flex flex-col w-full">
+                        {/* 52px spacer perfectly offsets the 28px heading + 24px (mb-6) from the sidebar above it */}
+                        <div className="hidden lg:block h-[52px] shrink-0" />
                         <motion.div
                             layout
-                            className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-8"
+                            className="flex-1 grid auto-rows-fr grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:pb-0 pb-8"
                         >
                             <AnimatePresence mode="popLayout">
                                 {filteredTeam.map((member, index) => {
@@ -164,28 +202,34 @@ export function TeamSection() {
                                         <motion.div
                                             layout
                                             key={member.name}
+                                            id={`person-${member.name.replace(/\s+/g, '-')}`}
                                             initial={{ opacity: 0, scale: 0.9 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.9 }}
                                             transition={{ duration: 0.3 }}
-                                            onMouseEnter={() => setHoveredMember(member.name)}
-                                            onMouseLeave={() => setHoveredMember(null)}
+                                            onPointerEnter={(e) => {
+                                                if (e.pointerType === "mouse") setHoveredMember(member.name)
+                                            }}
+                                            onPointerLeave={(e) => {
+                                                if (e.pointerType === "mouse") setHoveredMember(null)
+                                            }}
+                                            onClick={() => setHoveredMember(prev => prev === member.name ? null : member.name)}
                                             className={cn(
-                                                "group relative border border-border/40 bg-card/30 overflow-hidden rounded-lg transition-all duration-500",
+                                                "group aspect-[3/4] lg:aspect-auto lg:h-full relative border border-border/40 bg-card/30 overflow-hidden rounded-lg transition-all duration-500",
                                                 isDimmed ? "opacity-30 scale-95 grayscale" : "opacity-100 scale-100",
                                                 isHovered ? "ring-1 ring-primary/50 shadow-lg scale-[1.02] z-10" : ""
                                             )}
                                         >
-                                            <div className="flex flex-col h-full">
+                                            <div className="flex flex-col h-full w-full">
                                                 {/* Image & Overlay Section */}
-                                                <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
+                                                <div className="relative h-full w-full overflow-hidden bg-muted">
                                                     {member.image ? (
                                                         <Image
                                                             src={member.image}
                                                             alt={member.name}
                                                             fill
                                                             className={cn(
-                                                                "object-cover transition-all duration-500",
+                                                                "object-cover object-top transition-all duration-500",
                                                                 isHovered ? "grayscale-0 scale-105" : "grayscale group-hover:grayscale-0 group-hover:scale-105"
                                                             )}
                                                         />
@@ -202,10 +246,10 @@ export function TeamSection() {
                                                         transition={{ duration: 0.3 }}
                                                         className="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/90 via-black/40 to-transparent"
                                                     >
-                                                        <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                                                        <h3 className="text-base md:text-lg font-medium text-white flex items-center gap-2">
                                                             {member.name}
                                                         </h3>
-                                                        <p className="text-sm text-white/70 mt-1 font-mono uppercase tracking-wide">
+                                                        <p className="text-xs md:text-sm text-white/70 mt-1 font-mono uppercase tracking-wide">
                                                             {member.role}
                                                         </p>
                                                     </motion.div>
@@ -222,4 +266,3 @@ export function TeamSection() {
         </section>
     )
 }
-
