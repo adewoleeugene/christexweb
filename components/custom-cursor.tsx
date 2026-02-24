@@ -30,15 +30,15 @@ export function CustomCursor() {
     const handleMouseEnter = () => setIsVisible(true)
 
     const updateCursorType = (e: MouseEvent) => {
-      const hoveredEl = document.elementFromPoint(e.clientX, e.clientY)
-      if (hoveredEl) {
-        const computed = window.getComputedStyle(hoveredEl)
+      const hoveredEl = e.target as HTMLElement
+      if (hoveredEl && hoveredEl.closest) {
         setIsPointer(
-          computed.cursor === "pointer" ||
-            hoveredEl.tagName === "BUTTON" ||
-            hoveredEl.tagName === "A" ||
-            hoveredEl.closest("button") !== null ||
-            hoveredEl.closest("a") !== null,
+          hoveredEl.tagName === "BUTTON" ||
+          hoveredEl.tagName === "A" ||
+          hoveredEl.closest("button") !== null ||
+          hoveredEl.closest("a") !== null ||
+          hoveredEl.closest('[class*="cursor-pointer"]') !== null ||
+          window.getComputedStyle(hoveredEl).cursor === "pointer",
         )
       }
     }
