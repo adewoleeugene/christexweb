@@ -3,9 +3,11 @@
 import * as React from "react"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, MonitorPlay, BookOpen } from "lucide-react"
+import { Menu, X, MonitorPlay, BookOpen, ExternalLink, Copy, Check } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import Image from "next/image"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   NavigationMenu,
@@ -97,6 +99,7 @@ interface HeaderProps {
 }
 
 export function Header({ learnResources = [] }: HeaderProps) {
+  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
   // Merge/Transform learn resources
@@ -169,6 +172,16 @@ export function Header({ learnResources = [] }: HeaderProps) {
     imageUrl: null
   };
 
+  const isCommunityActive = communityItems.some(item =>
+    item.href.startsWith('/') && (pathname === item.href || pathname?.startsWith(item.href + '/'))
+  )
+
+  const isLearnActive = menuItems.some((section: any) =>
+    section.items.some((item: any) =>
+      item.href.startsWith('/') && (pathname === item.href || pathname?.startsWith(item.href + '/'))
+    )
+  )
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -188,20 +201,33 @@ export function Header({ learnResources = [] }: HeaderProps) {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-2">
-            <NavigationMenu className="z-50">
+            <NavigationMenu className="z-50" delayDuration={0}>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent data-[active]:bg-transparent">
+                  <NavigationMenuTrigger
+                    className={cn(
+                      "bg-transparent text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent data-[active]:bg-transparent",
+                      isCommunityActive && "text-primary font-semibold bg-primary/10 hover:bg-primary/10"
+                    )}
+                  >
                     Community
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <div className="grid w-[500px] grid-cols-[1fr_220px] gap-4 p-4 md:w-[600px] md:grid-cols-[1fr_240px]">
                       <ul className="grid gap-2">
-                        {communityItems.map((item) => (
-                          <ListItem key={item.title} title={item.title} href={item.href}>
-                            {item.description}
-                          </ListItem>
-                        ))}
+                        {communityItems.map((item) => {
+                          const isActive = item.href.startsWith('/') && (pathname === item.href || pathname?.startsWith(item.href + '/'))
+                          return (
+                            <ListItem
+                              key={item.title}
+                              title={item.title}
+                              href={item.href}
+                              className={isActive ? "bg-primary/10 text-primary" : ""}
+                            >
+                              {item.description}
+                            </ListItem>
+                          )
+                        })}
                       </ul>
                       <a
                         href={effectiveFeaturedItem.link}
@@ -240,7 +266,12 @@ export function Header({ learnResources = [] }: HeaderProps) {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="bg-transparent text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent data-[active]:bg-transparent">
+                  <NavigationMenuTrigger
+                    className={cn(
+                      "bg-transparent text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent data-[active]:bg-transparent",
+                      isLearnActive && "text-primary font-semibold bg-primary/10 hover:bg-primary/10"
+                    )}
+                  >
                     Learn
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -253,11 +284,19 @@ export function Header({ learnResources = [] }: HeaderProps) {
                               {section.category}
                             </h4> */}
                             <ul className="grid gap-2">
-                              {section.items.map((item: any) => (
-                                <ListItem key={item.title} title={item.title} href={item.href}>
+                              {section.items.map((item: any) => {
+                                const isActive = item.href.startsWith('/') && (pathname === item.href || pathname?.startsWith(item.href + '/'))
+                                return (
+                                  <ListItem
+                                    key={item.title}
+                                    title={item.title}
+                                    href={item.href}
+                                    className={isActive ? "bg-primary/10 text-primary" : ""}
+                                  >
 
-                                </ListItem>
-                              ))}
+                                  </ListItem>
+                                )
+                              })}
                             </ul>
                           </div>
                         ))}
@@ -308,6 +347,19 @@ export function Header({ learnResources = [] }: HeaderProps) {
                     </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link href="/team" legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={cn(
+                        "group inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-transparent focus:bg-transparent focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-transparent data-[state=open]:bg-transparent transition-colors",
+                        (pathname === '/team' || pathname?.startsWith('/team/')) && "text-primary font-semibold bg-primary/10 hover:bg-primary/10"
+                      )}
+                    >
+                      The Team
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
 
@@ -317,12 +369,19 @@ export function Header({ learnResources = [] }: HeaderProps) {
               transition={{ duration: 0.3, delay: 0.5 }}
               className="ml-2"
             >
-              <a
-                href="#contact"
-                className="inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-transparent focus:bg-transparent transition-colors outline-none"
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText("hello@christex.foundation")
+                  toast.success("Email copied to clipboard!", {
+                    description: "hello@christex.foundation",
+                    duration: 3000,
+                  })
+                  window.location.href = "mailto:hello@christex.foundation"
+                }}
+                className="inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground hover:bg-transparent focus:bg-transparent transition-colors outline-none cursor-pointer"
               >
                 Partner With Us
-              </a>
+              </button>
             </motion.div>
           </div>
 
@@ -345,27 +404,43 @@ export function Header({ learnResources = [] }: HeaderProps) {
             <nav className="flex flex-col px-6 py-4 gap-4 max-h-[80vh] overflow-y-auto">
               <Accordion type="single" collapsible className="w-full border-none">
                 <AccordionItem value="community" className="border-none">
-                  <AccordionTrigger className="py-2 font-mono text-xs tracking-wider uppercase text-muted-foreground hover:text-foreground hover:no-underline">
+                  <AccordionTrigger
+                    className={cn(
+                      "py-2 font-mono text-xs tracking-wider uppercase text-muted-foreground hover:text-foreground hover:no-underline",
+                      isCommunityActive && "text-primary font-semibold"
+                    )}
+                  >
                     Community
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="flex flex-col gap-3 pl-4 pt-2">
-                      {communityItems.map((item) => (
-                        <a
-                          key={item.title}
-                          href={item.href}
-                          className="text-sm text-foreground/80 hover:text-foreground"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          {item.title}
-                        </a>
-                      ))}
+                      {communityItems.map((item) => {
+                        const isActive = item.href.startsWith('/') && (pathname === item.href || pathname?.startsWith(item.href + '/'))
+                        return (
+                          <a
+                            key={item.title}
+                            href={item.href}
+                            className={cn(
+                              "text-sm text-foreground/80 hover:text-foreground",
+                              isActive && "text-foreground font-semibold"
+                            )}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {item.title}
+                          </a>
+                        )
+                      })}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
 
                 <AccordionItem value="learn" className="border-none">
-                  <AccordionTrigger className="py-2 font-mono text-xs tracking-wider uppercase text-muted-foreground hover:text-foreground hover:no-underline">
+                  <AccordionTrigger
+                    className={cn(
+                      "py-2 font-mono text-xs tracking-wider uppercase text-muted-foreground hover:text-foreground hover:no-underline",
+                      isLearnActive && "text-primary font-semibold"
+                    )}
+                  >
                     Learn
                   </AccordionTrigger>
                   <AccordionContent>
@@ -374,16 +449,22 @@ export function Header({ learnResources = [] }: HeaderProps) {
                         <div key={section.category} className="space-y-2">
                           <div className="text-xs font-semibold text-muted-foreground uppercase">{section.category}</div>
                           <div className="flex flex-col gap-2 pl-2">
-                            {section.items.map((item: any) => (
-                              <a
-                                key={item.title}
-                                href={item.href}
-                                className="text-sm text-foreground/80 hover:text-foreground"
-                                onClick={() => setIsOpen(false)}
-                              >
-                                {item.title}
-                              </a>
-                            ))}
+                            {section.items.map((item: any) => {
+                              const isActive = item.href.startsWith('/') && (pathname === item.href || pathname?.startsWith(item.href + '/'))
+                              return (
+                                <a
+                                  key={item.title}
+                                  href={item.href}
+                                  className={cn(
+                                    "text-sm text-foreground/80 hover:text-foreground",
+                                    isActive && "text-foreground font-semibold"
+                                  )}
+                                  onClick={() => setIsOpen(false)}
+                                >
+                                  {item.title}
+                                </a>
+                              )
+                            })}
                           </div>
                         </div>
                       ))}
@@ -392,13 +473,31 @@ export function Header({ learnResources = [] }: HeaderProps) {
                 </AccordionItem>
               </Accordion>
 
+              <Link
+                href="/team"
+                className={cn(
+                  "py-2 font-mono text-xs tracking-wider uppercase text-muted-foreground hover:text-foreground border-b border-white/10",
+                  (pathname === '/team' || pathname?.startsWith('/team/')) && "text-primary font-semibold"
+                )}
+                onClick={() => setIsOpen(false)}
+              >
+                The Team
+              </Link>
+
               <Button
                 variant="outline"
                 size="sm"
                 className="font-mono text-xs tracking-wider uppercase rounded-none border-foreground text-foreground hover:bg-foreground hover:text-background w-fit bg-transparent mt-4"
-                asChild
+                onClick={() => {
+                  navigator.clipboard.writeText("hello@christex.foundation")
+                  toast.success("Email copied to clipboard!", {
+                    description: "hello@christex.foundation",
+                  })
+                  window.location.href = "mailto:hello@christex.foundation"
+                  setIsOpen(false)
+                }}
               >
-                <a href="#contact">Partner With Us</a>
+                Partner With Us
               </Button>
             </nav>
           </motion.div>
@@ -418,13 +517,13 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "group block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary focus:bg-primary/10 focus:text-primary",
             className
           )}
           {...props}
         >
-          <div className="text-sm font-medium leading-none text-foreground">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+          <div className="text-sm font-medium leading-none text-white group-hover:text-primary">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-white/60 group-hover:text-white/80">
             {children}
           </p>
         </a>

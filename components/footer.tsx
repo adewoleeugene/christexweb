@@ -51,7 +51,7 @@ export function Footer() {
             </p>
             <p className="font-mono text-xs text-muted-foreground mb-6">Freetown, Sierra Leone</p>
             <div className="font-mono text-xs text-muted-foreground">
-              © 2025 Christex Foundation. All rights reserved.
+              © {new Date().getFullYear()} Christex Foundation. All rights reserved.
             </div>
           </div>
 
@@ -120,7 +120,7 @@ export function Footer() {
         <div className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="font-mono text-xs text-muted-foreground">
             <span className="text-muted-foreground/50">STATUS:</span>{" "}
-            <span className="text-accent">● 2025 INNOVATION HUB OF THE YEAR</span>
+            <span className="text-accent">● {new Date().getFullYear()} INNOVATION HUB OF THE YEAR</span>
           </div>
           <div className="font-mono text-xs text-muted-foreground flex flex-wrap items-center gap-6">
             <a

@@ -4,9 +4,41 @@ import { getBlogPostBySlug, getBlogPosts, BlogPost } from "@/lib/airtable"
 import { notFound } from "next/navigation"
 import { User, Calendar, Clock, ArrowLeft, ChevronRight, ChevronLeft } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Button } from "@/components/ui/button"
+import type { Metadata } from "next"
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const { slug } = await params
+    const post = await getBlogPostBySlug(slug)
+
+    if (!post) {
+        return {
+            title: 'Post Not Found',
+        }
+    }
+
+    return {
+        title: post.title,
+        description: post.excerpt,
+        openGraph: {
+            title: post.title,
+            description: post.excerpt,
+            images: post.imageUrl ? [{ url: post.imageUrl }] : [],
+            type: 'article',
+            publishedTime: post.date,
+            authors: post.author ? [post.author] : [],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: post.title,
+            description: post.excerpt,
+            images: post.imageUrl ? [post.imageUrl] : [],
+        },
+    }
+}
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
@@ -91,8 +123,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                     {/* Header Image Section */}
                     {post.imageUrl && (
-                        <div className="mb-12 rounded-2xl overflow-hidden aspect-video border border-border">
-                            <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
+                        <div className="mb-12 rounded-2xl overflow-hidden aspect-video border border-border relative">
+                            <Image
+                                src={post.imageUrl}
+                                alt={post.title}
+                                fill
+                                className="object-cover"
+                                priority
+                                sizes="(max-width: 768px) 100vw, 800px"
+                            />
                         </div>
                     )}
 
@@ -133,7 +172,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
                                     return (
                                         <div className="my-8 rounded-xl overflow-hidden border border-border">
-                                            <img {...props} className="w-full h-auto" />
+                                            <Image
+                                                src={props.src as string || ''}
+                                                alt={props.alt || ''}
+                                                width={0}
+                                                height={0}
+                                                sizes="100vw"
+                                                className="w-full h-auto"
+                                            />
                                         </div>
                                     )
                                 },
