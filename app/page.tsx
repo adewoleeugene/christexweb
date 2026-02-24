@@ -56,9 +56,9 @@ export default async function HomePage() {
       <Header learnResources={learnResources} />
       <HeroSection />
       <StatsBar />
-      <ServicesSection />
-      <BlockchainParallax />
       <AboutSection />
+      <BlockchainParallax />
+      <ServicesSection />
       <VentureStudioSection />
       <PartnersSection />
       <ContactSection />

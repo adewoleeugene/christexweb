@@ -2,9 +2,16 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Calendar, User, ArrowUpRight, Filter, Search } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import { getBlogPosts, BlogPost } from "@/lib/airtable"
 import { Button } from "@/components/ui/button"
 import { BlogList } from "@/components/blog-list"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+    title: "News & Insights",
+    description: "Latest updates, stories, and insights from the Christex Foundation team and community.",
+}
 
 export default async function BlogPage() {
     const posts = await getBlogPosts()
@@ -32,7 +39,16 @@ export default async function BlogPage() {
                         <div className="grid lg:grid-cols-2 gap-12 items-center group cursor-pointer">
                             <Link href={`/blog/${featuredPost.slug}`} className="aspect-[16/10] bg-muted rounded-2xl overflow-hidden relative border border-border block">
                                 {featuredPost.imageUrl ? (
-                                    <img src={featuredPost.imageUrl} alt={featuredPost.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                                    <div className="relative w-full h-full">
+                                        <Image
+                                            src={featuredPost.imageUrl}
+                                            alt={featuredPost.title}
+                                            fill
+                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                            sizes="(max-width: 768px) 100vw, 50vw"
+                                            priority
+                                        />
+                                    </div>
                                 ) : (
                                     <div className="w-full h-full bg-neutral-900 group-hover:scale-105 transition-transform duration-500" />
                                 )}

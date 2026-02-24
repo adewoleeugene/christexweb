@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { toast } from "sonner"
 import { LLMAnimation } from "./llm-animation"
 import ColorBends from "./ColorBends"
 
@@ -175,14 +176,21 @@ export function HeroSection() {
                 >
                   Explore Our Work
                 </motion.a>
-                <motion.a
-                  href="#contact"
+                <motion.button
+                  onClick={() => {
+                    navigator.clipboard.writeText("hello@christex.foundation")
+                    toast.success("Email copied to clipboard!", {
+                      description: "hello@christex.foundation",
+                      duration: 3000,
+                    })
+                    window.location.href = "mailto:hello@christex.foundation"
+                  }}
                   className="inline-flex items-center justify-center px-8 py-3 border border-border text-foreground font-mono text-xs tracking-widest uppercase hover:bg-secondary transition-colors"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   Partner With Us
-                </motion.a>
+                </motion.button>
               </div>
             </div>
           </motion.div>

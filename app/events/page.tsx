@@ -2,7 +2,14 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Calendar, MapPin, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 import { getEvents } from "@/lib/airtable"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+    title: "Events",
+    description: "Connect, learn, and build with us. Discover upcoming events, workshops, and gatherings in the Christex ecosystem.",
+}
 
 export default async function EventsPage() {
     const events = await getEvents()
@@ -33,7 +40,13 @@ export default async function EventsPage() {
                                 {/* Event Image Placeholder */}
                                 <div className="h-48 bg-gradient-to-br from-gray-900 to-gray-800 group-hover:scale-105 transition-transform duration-500 relative scroll-overflow-hidden">
                                     {event.imageUrl ? (
-                                        <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
+                                        <Image
+                                            src={event.imageUrl}
+                                            alt={event.title}
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-width: 768px) 100vw, 33vw"
+                                        />
                                     ) : (
                                         <div className="absolute inset-0 flex items-center justify-center text-white/10 font-mono text-4xl font-bold">
                                             {event.category.substring(0, 2)}

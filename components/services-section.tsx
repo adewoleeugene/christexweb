@@ -27,7 +27,7 @@ const services = [
     title: "Digital Skills Training",
     description:
       "Free, instructor-led programs in digital literacy, software engineering, design, AI, and blockchain. Our four-stage framework takes learners from foundations to deployment.",
-    capabilities: ["Software Engineering", "Product Design", "AI & Blockchain", "Digital Literacy"],
+    capabilities: ["Engineering", "Media", "AI & Blockchain", "Digital Literacy"],
     colSpan: "lg:col-span-2",
   },
   {

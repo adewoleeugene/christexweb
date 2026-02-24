@@ -125,151 +125,174 @@ We heavily invested in pilot programs...
 
 const MOCK_LEARN_RESOURCES: LearnResource[] = [];
 
-export async function getEvents(): Promise<Event[]> {
-    if (!base || !eventsTableId) {
-        console.warn("Airtable credentials or table ID missing, using mock data for Events.");
-        return MOCK_EVENTS;
-    }
+// Cached Data Fetching Functions using unstable_cache
+import { unstable_cache } from 'next/cache';
 
-    try {
-        const records = await base(eventsTableId).select({
-            sort: [{ field: 'Date', direction: 'asc' }],
-            filterByFormula: "IS_AFTER({Date}, TODAY())" // Only future events
-        }).all();
-
-        return records.map(record => ({
-            id: record.id,
-            title: record.get('Title') as string,
-            date: record.get('Date') as string,
-            location: record.get('Location') as string,
-            description: record.get('Description') as string,
-            category: record.get('Category') as string,
-            imageUrl: (record.get('Image') as any)?.[0]?.url,
-            registrationLink: record.get('RegistrationLink') as string,
-        }));
-    } catch (error) {
-        console.error("Error fetching events from Airtable:", error);
-        return MOCK_EVENTS;
-    }
-}
-
-export async function getGalleryImages(): Promise<string[]> {
-    if (!base || !galleryTableId) {
-        return [];
-    }
-
-    try {
-        const records = await base(galleryTableId).select({
-            maxRecords: 100,
-            view: "Grid view" // Optional: specify a view if needed
-        }).all();
-
-        // Extract all images from all records
-        const images: string[] = [];
-        records.forEach(record => {
-            const attachments = record.get('Images') as any[];
-            if (attachments && Array.isArray(attachments)) {
-                attachments.forEach(photo => {
-                    // Prioritize web-safe thumbnails if available (handles HEIC/DNG conversion automatically)
-                    const thumbnailUrl = photo.thumbnails?.full?.url ||
-                        photo.thumbnails?.large?.url ||
-                        photo.thumbnails?.small?.url;
-
-                    if (thumbnailUrl) {
-                        images.push(thumbnailUrl);
-                    } else {
-                        // If no thumbnails exist (common for raw files like DNG/HEIC that Airtable hasn't processed yet),
-                        // we MUST filter out non-web formats to avoid broken images on the frontend.
-                        // Only allow fallback to raw URL for natively supported web formats.
-                        const filename = photo.filename || '';
-                        const type = photo.type || '';
-
-                        const isWebSafe = /\.(jpg|jpeg|png|gif|webp)$/i.test(filename) ||
-                            /image\/(jpeg|png|gif|webp)/.test(type);
-
-                        if (isWebSafe && photo.url) {
-                            images.push(photo.url);
-                        }
-                    }
-                });
-            }
-        });
-
-        return images;
-    } catch (error) {
-        console.error("Error fetching gallery images from Airtable:", error);
-        return [];
-    }
-}
-
-export async function getBlogPosts(): Promise<BlogPost[]> {
-    if (!base || !blogTableId) {
-        console.warn("Airtable credentials or table ID missing (base is null), using mock data for Blog.");
-        return MOCK_NEWS;
-    }
-
-    try {
-        const records = await base(blogTableId).select({
-            sort: [{ field: 'Date', direction: 'desc' }],
-        }).all();
-
-        return records.map(record => mapRecordToBlogPost(record));
-    } catch (error) {
-        console.error("Error fetching news from Airtable:", error);
-        return MOCK_NEWS;
-    }
-}
-
-export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
-    if (!base || !blogTableId) {
-        return MOCK_NEWS.find(p => p.slug === slug) || null;
-    }
-
-    try {
-        const decodedSlug = decodeURIComponent(slug);
-
-        const records = await base(blogTableId).select({
-            filterByFormula: `{Slug} = '${decodedSlug}'`,
-            maxRecords: 1
-        }).firstPage();
-
-        if (records.length === 0) {
-            return null;
+export const getEvents = unstable_cache(
+    async (): Promise<Event[]> => {
+        if (!base || !eventsTableId) {
+            console.warn("Airtable credentials or table ID missing, using mock data for Events.");
+            return MOCK_EVENTS;
         }
 
-        return mapRecordToBlogPost(records[0]);
-    } catch (error) {
-        console.error("Error fetching single post from Airtable:", error);
-        return null;
-    }
-}
+        try {
+            const records = await base(eventsTableId).select({
+                sort: [{ field: 'Date', direction: 'asc' }],
+                filterByFormula: "IS_AFTER({Date}, TODAY())" // Only future events
+            }).all();
 
-export async function getLearnResources(): Promise<LearnResource[]> {
-    const learnTableId = process.env.AIRTABLE_LEARN_TABLE_ID;
+            return records.map(record => ({
+                id: record.id,
+                title: record.get('Title') as string,
+                date: record.get('Date') as string,
+                location: record.get('Location') as string,
+                description: record.get('Description') as string,
+                category: record.get('Category') as string,
+                imageUrl: (record.get('Image') as any)?.[0]?.url,
+                registrationLink: record.get('RegistrationLink') as string,
+            }));
+        } catch (error) {
+            console.error("Error fetching events from Airtable:", error);
+            return MOCK_EVENTS;
+        }
+    },
+    ['events-list'],
+    { tags: ['events'], revalidate: 3600 }
+);
 
-    if (!base || !learnTableId) {
-        return MOCK_LEARN_RESOURCES;
-    }
+export const getGalleryImages = unstable_cache(
+    async (): Promise<string[]> => {
+        if (!base || !galleryTableId) {
+            return [];
+        }
 
-    try {
-        const records = await base(learnTableId).select({
-            sort: [{ field: 'Title', direction: 'asc' }]
-        }).all();
+        try {
+            const records = await base(galleryTableId).select({
+                maxRecords: 100,
+                view: "Grid view" // Optional: specify a view if needed
+            }).all();
 
-        return records.map(record => ({
-            id: record.id,
-            title: record.get('Title') as string,
-            url: record.get('URL') as string,
-            category: record.get('Category') as string,
-            featured: record.get('Featured') as boolean,
-            thumbnail: (record.get('Thumbnail') as any)?.[0]?.url || (record.get('ThumbnailURL') as string),
-            description: record.get('Description') as string,
-        }));
-    } catch (error) {
-        console.error("Error fetching learn resources from Airtable:", error);
-        return MOCK_LEARN_RESOURCES;
-    }
-}
+            // Extract all images from all records
+            const images: string[] = [];
+            records.forEach(record => {
+                const attachments = record.get('Images') as any[];
+                if (attachments && Array.isArray(attachments)) {
+                    attachments.forEach(photo => {
+                        // Prioritize web-safe thumbnails if available (handles HEIC/DNG conversion automatically)
+                        const thumbnailUrl = photo.thumbnails?.full?.url ||
+                            photo.thumbnails?.large?.url ||
+                            photo.thumbnails?.small?.url;
+
+                        if (thumbnailUrl) {
+                            images.push(thumbnailUrl);
+                        } else {
+                            // If no thumbnails exist (common for raw files like DNG/HEIC that Airtable hasn't processed yet),
+                            // we MUST filter out non-web formats to avoid broken images on the frontend.
+                            // Only allow fallback to raw URL for natively supported web formats.
+                            const filename = photo.filename || '';
+                            const type = photo.type || '';
+
+                            const isWebSafe = /\.(jpg|jpeg|png|gif|webp)$/i.test(filename) ||
+                                /image\/(jpeg|png|gif|webp)/.test(type);
+
+                            if (isWebSafe && photo.url) {
+                                images.push(photo.url);
+                            }
+                        }
+                    });
+                }
+            });
+
+            return images;
+        } catch (error) {
+            console.error("Error fetching gallery images from Airtable:", error);
+            return [];
+        }
+    },
+    ['gallery-images'],
+    { tags: ['gallery'], revalidate: 3600 }
+);
+
+export const getBlogPosts = unstable_cache(
+    async (): Promise<BlogPost[]> => {
+        if (!base || !blogTableId) {
+            console.warn("Airtable credentials or table ID missing (base is null), using mock data for Blog.");
+            return MOCK_NEWS;
+        }
+
+        try {
+            const records = await base(blogTableId).select({
+                sort: [{ field: 'Date', direction: 'desc' }],
+            }).all();
+
+            return records.map(record => mapRecordToBlogPost(record));
+        } catch (error) {
+            console.error("Error fetching news from Airtable:", error);
+            return MOCK_NEWS;
+        }
+    },
+    ['blog-posts'],
+    { tags: ['blog'], revalidate: 3600 }
+);
+
+export const getBlogPostBySlug = unstable_cache(
+    async (slug: string): Promise<BlogPost | null> => {
+        if (!base || !blogTableId) {
+            return MOCK_NEWS.find(p => p.slug === slug) || null;
+        }
+
+        try {
+            const decodedSlug = decodeURIComponent(slug);
+
+            const records = await base(blogTableId).select({
+                filterByFormula: `{Slug} = '${decodedSlug}'`,
+                maxRecords: 1
+            }).firstPage();
+
+            if (records.length === 0) {
+                return null;
+            }
+
+            return mapRecordToBlogPost(records[0]);
+        } catch (error) {
+            console.error("Error fetching single post from Airtable:", error);
+            return null;
+        }
+    },
+    ['blog-post-by-slug'],
+    { tags: ['blog'], revalidate: 3600 }
+);
+
+export const getLearnResources = unstable_cache(
+    async (): Promise<LearnResource[]> => {
+        const learnTableId = process.env.AIRTABLE_LEARN_TABLE_ID;
+
+        if (!base || !learnTableId) {
+            return MOCK_LEARN_RESOURCES;
+        }
+
+        try {
+            const records = await base(learnTableId).select({
+                sort: [{ field: 'Title', direction: 'asc' }]
+            }).all();
+
+            return records.map(record => ({
+                id: record.id,
+                title: record.get('Title') as string,
+                url: record.get('URL') as string,
+                category: record.get('Category') as string,
+                featured: record.get('Featured') as boolean,
+                thumbnail: (record.get('Thumbnail') as any)?.[0]?.url || (record.get('ThumbnailURL') as string),
+                description: record.get('Description') as string,
+            }));
+        } catch (error) {
+            console.error("Error fetching learn resources from Airtable:", error);
+            return MOCK_LEARN_RESOURCES;
+        }
+    },
+    ['learn-resources'],
+    { tags: ['learn'], revalidate: 3600 }
+);
 
 function mapRecordToBlogPost(record: any): BlogPost {
     // Helper to safely extract attachment URLs array

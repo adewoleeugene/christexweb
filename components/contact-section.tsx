@@ -74,7 +74,7 @@ export function ContactSection() {
           </h2>
 
           <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            {"We're actively seeking strategic partners, donors, and consultants to scale our impact across education, innovation, and civic technology."}
+            {"We welcome strategic partners, donors, and consultants to join us in scaling our impact across education, innovation, and civic technology."}
           </p>
         </motion.div>
 
