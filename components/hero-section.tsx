@@ -3,8 +3,10 @@
 import { useRef, useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "sonner"
-import { LLMAnimation } from "./llm-animation"
-import ColorBends from "./ColorBends"
+import dynamic from "next/dynamic"
+
+const LLMAnimation = dynamic(() => import("./llm-animation").then(mod => mod.LLMAnimation), { ssr: false })
+const ColorBends = dynamic(() => import("./ColorBends"), { ssr: false })
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
@@ -74,9 +76,9 @@ export function HeroSection() {
 
   return (
     <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-      {/* ColorBends background - shows by default */}
+      {/* ColorBends background - shows by default on desktop */}
       <AnimatePresence>
-        {!isIdle && (
+        {!isIdle && !isMobile && (
           <motion.div
             className="absolute inset-0 z-0"
             initial={{ opacity: 1 }}
@@ -103,9 +105,9 @@ export function HeroSection() {
         )}
       </AnimatePresence>
 
-      {/* LLM Animation - shows when idle */}
+      {/* LLM Animation - shows when idle on desktop, or always on mobile */}
       <AnimatePresence>
-        {isIdle && (
+        {(isIdle || isMobile) && (
           <motion.div
             className="absolute inset-0 z-0"
             initial={{ opacity: 0 }}
