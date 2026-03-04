@@ -1,12 +1,32 @@
 "use client"
 
 import { useRef, useState, useEffect, useCallback } from "react"
+import type { CSSProperties, ComponentType } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "sonner"
 import dynamic from "next/dynamic"
 
+type ColorBendsProps = {
+  className?: string
+  style?: CSSProperties
+  rotation?: number
+  speed?: number
+  colors?: string[]
+  transparent?: boolean
+  autoRotate?: number
+  scale?: number
+  frequency?: number
+  warpStrength?: number
+  mouseInfluence?: number
+  parallax?: number
+  noise?: number
+}
+
 const LLMAnimation = dynamic(() => import("./llm-animation").then(mod => mod.LLMAnimation), { ssr: false })
-const ColorBends = dynamic(() => import("./ColorBends"), { ssr: false })
+const ColorBends = dynamic<ColorBendsProps>(
+  () => import("./ColorBends") as Promise<{ default: ComponentType<ColorBendsProps> }>,
+  { ssr: false }
+)
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
@@ -152,14 +172,14 @@ export function HeroSection() {
               </div>
 
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-light tracking-tight text-foreground text-balance max-w-4xl mx-auto">
-                Educate. Empower.
+                Sierra Leone&apos;s AI &amp;
                 <br />
-                <span className="text-muted-foreground">Earn.</span>
+                <span className="text-muted-foreground">Blockchain Innovation Hub</span>
               </h1>
 
               <p className="font-mono text-sm md:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Driving Sierra Leone's digital transformation through AI and blockchain education, venture building, and
-                civic technology solutions.
+                We train digital talent, build ventures, and launch civic technology programs for communities, founders,
+                and institutions across Sierra Leone and West Africa.
               </p>
 
               <div

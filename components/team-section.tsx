@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import Link from "next/link"
-import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { ArrowUpRight, Grid, Layers, Code, Users } from "lucide-react"
+import { CustomCursor } from "@/components/custom-cursor"
 
 interface TeamMember {
     name: string
@@ -98,15 +96,7 @@ const team: TeamMember[] = [
     },
 ]
 
-const categories = [
-    { id: "All", label: "All", icon: Grid },
-    { id: "Management", label: "Management", icon: Users },
-    { id: "Design", label: "Design", icon: Layers },
-    { id: "Development", label: "Development", icon: Code },
-]
-
 export function TeamSection() {
-    const [activeCategory, setActiveCategory] = useState("All")
     const [hoveredMember, setHoveredMember] = useState<string | null>(null)
 
     useEffect(() => {
@@ -136,12 +126,9 @@ export function TeamSection() {
         }
     }, [hoveredMember])
 
-    const filteredTeam = activeCategory === "All"
-        ? team
-        : team.filter(member => member.category === activeCategory)
-
     return (
         <section className="relative w-full min-h-screen lg:h-screen lg:max-h-screen py-4 md:py-8 bg-background text-foreground flex flex-col">
+            <CustomCursor />
             <div className="container mx-auto px-4 md:px-6 flex-1 flex flex-col">
 
                 {/* System Status */}
@@ -196,24 +183,15 @@ export function TeamSection() {
                     <div className="flex-1 min-h-0 scrollbar-none pr-0 lg:pr-2 flex flex-col w-full">
                         {/* 52px spacer perfectly offsets the 28px heading + 24px (mb-6) from the sidebar above it */}
                         <div className="hidden lg:block h-[52px] shrink-0" />
-                        <motion.div
-                            layout
-                            className="flex-1 grid auto-rows-fr grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:pb-0 pb-8"
-                        >
-                            <AnimatePresence mode="popLayout">
-                                {filteredTeam.map((member, index) => {
+                        <div className="flex-1 grid auto-rows-fr grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:pb-0 pb-8">
+                                {team.map((member) => {
                                     const isHovered = hoveredMember === member.name
                                     const isDimmed = hoveredMember !== null && !isHovered
 
                                     return (
-                                        <motion.div
-                                            layout
+                                        <div
                                             key={member.name}
                                             id={`person-${member.name.replace(/\s+/g, '-')}`}
-                                            initial={{ opacity: 0, scale: 0.9 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.9 }}
-                                            transition={{ duration: 0.3 }}
                                             onPointerEnter={(e) => {
                                                 if (e.pointerType === "mouse") setHoveredMember(member.name)
                                             }}
@@ -235,6 +213,8 @@ export function TeamSection() {
                                                             src={member.image}
                                                             alt={member.name}
                                                             fill
+                                                            loading="lazy"
+                                                            sizes="(max-width: 1024px) 50vw, (max-width: 1280px) 25vw, 20vw"
                                                             className={cn(
                                                                 "object-cover object-top transition-all duration-500",
                                                                 isHovered ? "grayscale-0 scale-105" : "grayscale group-hover:grayscale-0 group-hover:scale-105"
@@ -247,11 +227,9 @@ export function TeamSection() {
                                                     )}
 
                                                     {/* Text Overlay */}
-                                                    <motion.div
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: isHovered ? 1 : 0 }}
-                                                        transition={{ duration: 0.3 }}
+                                                    <div
                                                         className="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/90 via-black/40 to-transparent"
+                                                        style={{ opacity: isHovered ? 1 : 0, transition: "opacity 0.3s ease" }}
                                                     >
                                                         <h3 className="text-base md:text-lg font-medium text-white flex items-center gap-2">
                                                             {member.name}
@@ -259,14 +237,13 @@ export function TeamSection() {
                                                         <p className="text-xs md:text-sm text-white/70 mt-1 font-mono uppercase tracking-wide">
                                                             {member.role}
                                                         </p>
-                                                    </motion.div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </motion.div>
+                                        </div>
                                     )
                                 })}
-                            </AnimatePresence>
-                        </motion.div>
+                        </div>
                     </div>
                 </div>
             </div>

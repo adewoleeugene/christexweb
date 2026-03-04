@@ -5,16 +5,12 @@ import { useRef } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 
-const defaultImages = [
-    "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?q=80&w=800&auto=format&fit=crop",
+const hardcodedImages = [
+    "/images/gallery/IMG_2206.webp",
+    "/images/gallery/IMG_2207.webp",
+    "/images/gallery/IMG_2212.webp",
+    "/images/gallery/IMG_2228.webp",
+    "/images/gallery/IMG_4484.webp",
 ]
 
 function MarqueeRow({
@@ -60,16 +56,13 @@ function MarqueeRow({
     )
 }
 
-export function GallerySection({ images = defaultImages }: { images?: string[] }) {
+export function GallerySection() {
     const containerRef = useRef<HTMLDivElement>(null)
     const isInView = useInView(containerRef, { once: true, margin: "-100px" })
 
-    // Use provided images effectively
-    const displayImages = images.length > 0 ? images : defaultImages
-
     // Split images into two interleaved sets for better distribution of similar photos
-    const row1 = displayImages.filter((_: string, i: number) => i % 2 === 0)
-    const row2 = displayImages.filter((_: string, i: number) => i % 2 === 1).reverse()
+    const row1 = hardcodedImages.filter((_: string, i: number) => i % 2 === 0)
+    const row2 = hardcodedImages.filter((_: string, i: number) => i % 2 === 1).reverse()
 
     return (
         <section ref={containerRef} className="py-24 bg-background border-t border-border overflow-hidden">

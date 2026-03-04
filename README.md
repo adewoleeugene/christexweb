@@ -50,3 +50,18 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `start`: Starts the Next.js production server.
 - `lint`: Runs ESLint to catch syntax and style issues.
 - `gallery:process`: Script to process gallery assets.
+- `images:optimize`: Recompresses large images in-place with WebP for faster page loads.
+
+### Image Optimization Usage
+The image optimizer is scriptable for any folder and supports optional tuning:
+
+```bash
+# Default target: public/images/team, max dimension 1600, quality 78, min size 700000 bytes
+npm run images:optimize
+
+# Custom target and settings
+./scripts/optimize-images.sh public/images/gallery 1920 80 500000
+```
+
+Requirements:
+- `cwebp` must be installed and available in PATH.

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getBlogPosts, getEvents } from '@/lib/airtable';
 
+export const revalidate = 3600;
+
 export async function GET() {
     try {
         const [posts, events] = await Promise.all([
@@ -8,39 +10,35 @@ export async function GET() {
             getEvents()
         ]);
 
-        // Normalize Data
-        const normalizedPosts = posts.map(p => ({
-            type: 'blog',
-            title: p.title,
-            description: p.excerpt,
-            category: p.category,
-            link: `/blog/${p.slug}`,
-            date: p.date,
-            sortDate: new Date(p.date).getTime(),
-            imageUrl: p.imageUrl // Pass image URL
-        }));
+        // Latest post (already sorted DESC in lib).
+        const latestPost = posts[0]
+            ? {
+                type: 'blog',
+                title: posts[0].title,
+                description: posts[0].excerpt,
+                category: posts[0].category,
+                link: `/blog/${posts[0].slug}`,
+                date: posts[0].date,
+                sortDate: new Date(posts[0].date).getTime(),
+                imageUrl: posts[0].imageUrl
+            }
+            : null;
 
-        const normalizedEvents = events.map(e => ({
-            type: 'event',
-            title: e.title,
-            description: e.description,
-            category: "Event",
-            link: e.registrationLink || "/events",
-            date: e.date,
-            sortDate: new Date(e.date).getTime(),
-            imageUrl: e.imageUrl // Pass image URL
-        }));
+        // Next upcoming event (already sorted ASC in lib).
+        const nextEvent = events[0]
+            ? {
+                type: 'event',
+                title: events[0].title,
+                description: events[0].description,
+                category: "Event",
+                link: events[0].registrationLink || "/events",
+                date: events[0].date,
+                sortDate: new Date(events[0].date).getTime(),
+                imageUrl: events[0].imageUrl
+            }
+            : null;
 
-        let featuredItem = null;
-
-        // 1. Latest Post (Already sorted DESC in lib)
-        const latestPost = normalizedPosts[0];
-
-        // 2. Next Upcoming Event (Already sorted ASC (future) in lib)
-        const nextEvent = normalizedEvents[0];
-
-        // Default to latest post
-        featuredItem = latestPost;
+        let featuredItem = latestPost;
 
         // If there is an event, and it's happening within 14 days, prioritize it
         if (nextEvent) {
