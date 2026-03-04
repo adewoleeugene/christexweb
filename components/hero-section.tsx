@@ -46,9 +46,23 @@ function useIsMobile() {
 export function HeroSection() {
   const isMobile = useIsMobile()
   const [isIdle, setIsIdle] = useState(false)
+  const [isColorBendsReady, setIsColorBendsReady] = useState(false)
   const [isHoveringButtons, setIsHoveringButtons] = useState(false)
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const colorBendsTimerRef = useRef<NodeJS.Timeout | null>(null)
   const heroRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    colorBendsTimerRef.current = setTimeout(() => {
+      setIsColorBendsReady(true)
+    }, 3000)
+
+    return () => {
+      if (colorBendsTimerRef.current) {
+        clearTimeout(colorBendsTimerRef.current)
+      }
+    }
+  }, [])
 
   const resetIdleTimer = useCallback(() => {
     if (isMobile) return
@@ -98,7 +112,7 @@ export function HeroSection() {
     <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
       {/* ColorBends background - shows by default on desktop */}
       <AnimatePresence>
-        {!isIdle && !isMobile && (
+        {isColorBendsReady && !isIdle && !isMobile && (
           <motion.div
             className="absolute inset-0 z-0"
             initial={{ opacity: 1 }}
