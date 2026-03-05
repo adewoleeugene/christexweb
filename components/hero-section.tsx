@@ -186,14 +186,14 @@ export function HeroSection() {
               </div>
 
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-light tracking-tight text-foreground text-balance max-w-4xl mx-auto">
-                Sierra Leone&apos;s AI &amp;
+                Educate. Empower.
                 <br />
-                <span className="text-muted-foreground">Blockchain Innovation Hub</span>
+                <span className="text-muted-foreground">Earn.</span>
               </h1>
 
               <p className="font-mono text-sm md:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                We train digital talent, build ventures, and launch civic technology programs for communities, founders,
-                and institutions across Sierra Leone and West Africa.
+                Driving Sierra Leone&apos;s digital transformation through AI and blockchain education, venture building, and
+                civic technology solutions.
               </p>
 
               <div

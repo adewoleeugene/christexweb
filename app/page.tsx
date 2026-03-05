@@ -14,16 +14,18 @@ import { getLearnResources } from "@/lib/airtable"
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: "AI & Blockchain Innovation Hub in Sierra Leone",
+  title: "Christex Foundation | Educate. Empower. Earn.",
   description:
-    "Christex Foundation is an innovation hub in Sierra Leone focused on AI, blockchain, digital skills training, venture studio programs, and civic technology.",
+    "Driving Sierra Leone's digital transformation through AI and blockchain education, venture building, and civic tech solutions. 2025 Innovation Hub of the Year.",
   keywords: [
-    "innovation hub in Sierra Leone",
-    "AI innovation hub",
-    "blockchain innovation hub",
-    "technology hub in Freetown",
-    "digital skills program Sierra Leone",
-    "venture studio Africa",
+    "Christex Foundation",
+    "Sierra Leone",
+    "Blockchain",
+    "AI",
+    "Education",
+    "Venture Studio",
+    "Civic Tech",
+    "Innovation Hub",
   ],
   alternates: {
     canonical: "/",

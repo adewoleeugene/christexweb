@@ -17,11 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://christex.foundation"),
   title: {
-    default: "Christex Foundation | AI & Blockchain Innovation Hub in Sierra Leone",
+    default: "Christex Foundation | Educate. Empower. Earn.",
     template: "%s | Christex Foundation",
   },
   description:
-    "Christex Foundation is an AI and blockchain innovation hub in Sierra Leone. We deliver digital skills training, venture studio support, and civic tech programs across West Africa.",
+    "Driving Sierra Leone's digital transformation through AI and blockchain education, venture building, and civic tech solutions. 2025 Innovation Hub of the Year.",
   generator: "Next.js",
   applicationName: "Christex Foundation",
   keywords: [
@@ -53,9 +53,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://christex.foundation",
-    title: "Christex Foundation | AI & Blockchain Innovation Hub in Sierra Leone",
+    title: "Christex Foundation | Educate. Empower. Earn.",
     description:
-      "An AI and blockchain innovation hub in Sierra Leone building talent, startups, and civic technology with practical education and venture support.",
+      "Driving Sierra Leone's digital transformation through AI and blockchain education, venture building, and civic tech solutions. 2025 Innovation Hub of the Year.",
     siteName: "Christex Foundation",
     images: [
       {
@@ -68,9 +68,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Christex Foundation | AI & Blockchain Innovation Hub",
+    title: "Christex Foundation | Educate. Empower. Earn.",
     description:
-      "AI and blockchain innovation hub in Sierra Leone focused on digital skills, venture building, and civic technology.",
+      "Driving Sierra Leone's digital transformation through AI and blockchain education. 2025 Innovation Hub of the Year.",
     site: "@ChristexFndn",
     creator: "@ChristexFndn",
     images: ["/images/logomark-20on-20black.png"],
